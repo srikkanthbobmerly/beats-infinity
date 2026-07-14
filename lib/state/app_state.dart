@@ -36,12 +36,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void createEvent(String theme, String eventDate, String deadline) {
+  void createEvent(String theme, String eventDate, String deadline, {String? posterPath}) {
     events.add(SingerEvent(
       id: 'e_${DateTime.now().millisecondsSinceEpoch}',
       theme: theme,
       eventDate: eventDate,
       submissionDeadline: deadline,
+      posterPath: posterPath,
     ));
     notifyListeners();
   }

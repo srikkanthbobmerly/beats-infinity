@@ -370,126 +370,6 @@ class _SeasonalOverlayState extends State<SeasonalOverlay> with SingleTickerProv
 }
 
 // -----------------------------------------------------------------------------
-// 6. Floating admin control — only visible to the logged-in admin, lets them
-//    preview/override any occasion without touching any of your screens.
-// -----------------------------------------------------------------------------
-
-class _FloatingMoodBadge extends StatelessWidget {
-  const _FloatingMoodBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    final user = context.watch<AppState>().currentUser;
-    if (user == null || !user.isAdmin) return const SizedBox.shrink();
-
-    final seasonal = context.watch<SeasonalThemeState>();
-    final palette = seasonal.palette;
-    final topInset = MediaQuery.of(context).padding.top;
-
-    return Positioned(
-      top: topInset + 6,
-      right: 12,
-      child: GestureDetector(
-        onTap: () => showModalBottomSheet(
-          context: context,
-          backgroundColor: Colors.transparent,
-          isScrollControlled: true,
-          builder: (_) => const _OccasionPickerSheet(),
-        ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: palette.primary.withOpacity(0.85),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))],
-            border: seasonal.isPreviewing ? Border.all(color: Colors.white, width: 1) : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(palette.emoji, style: const TextStyle(fontSize: 13)),
-              const SizedBox(width: 5),
-              Text(palette.label, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-              const SizedBox(width: 3),
-              const Icon(Icons.edit_rounded, color: Colors.white70, size: 12),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OccasionPickerSheet extends StatelessWidget {
-  const _OccasionPickerSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    final seasonal = context.watch<SeasonalThemeState>();
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              Icon(Icons.palette_rounded, color: AppColors.accent, size: 20),
-              SizedBox(width: 8),
-              Text('Preview a Mood', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Text("This changes the theme for everyone until you switch it back.",
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _option(context, null, '🔄', 'Auto', seasonal),
-              ...Occasion.values.where((o) => o != Occasion.regular).map((o) {
-                final p = occasionPalettes[o]!;
-                return _option(context, o, p.emoji, p.label, seasonal);
-              }),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _option(BuildContext context, Occasion? occasion, String emoji, String label, SeasonalThemeState seasonal) {
-    final active = occasion == null ? !seasonal.isPreviewing : (seasonal.isPreviewing && seasonal.active == occasion);
-    return GestureDetector(
-      onTap: () {
-        seasonal.setPreview(occasion);
-        Navigator.of(context).pop();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: active ? AppColors.primary : AppColors.cardAlt,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 6),
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// -----------------------------------------------------------------------------
 // 7. The app root — a drop-in replacement for your existing BeatsInfinityApp.
 // -----------------------------------------------------------------------------
 
@@ -513,7 +393,6 @@ class SeasonalBeatsInfinityApp extends StatelessWidget {
             children: [
               if (child != null) child,
               SeasonalOverlay(palette: seasonal.palette),
-              const _FloatingMoodBadge(),
             ],
           ),
         ),

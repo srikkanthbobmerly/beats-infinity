@@ -59,10 +59,9 @@ class ProfileTabBody extends StatelessWidget {
         const SizedBox(height: 24),
         if (user.isAdmin && showAdminEntry)
           _menuRow(context, Icons.admin_panel_settings_rounded, AppColors.accent, 'Admin Dashboard',
-              () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminDashboardScreen()))),
+                  () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminDashboardScreen()))),
         _menuRow(context, Icons.history_rounded, AppColors.teal, 'Past Events',
-            () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EventHistoryScreen()))),
-        _menuRow(context, Icons.notifications_outlined, AppColors.gold, 'Notifications', () {}),
+                () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EventHistoryScreen()))),
         _menuRow(context, Icons.help_outline_rounded, AppColors.textMuted, 'Help & Support', () {}),
         const SizedBox(height: 12),
         _menuRow(context, Icons.logout_rounded, AppColors.danger, 'Logout', () {

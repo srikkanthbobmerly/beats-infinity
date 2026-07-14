@@ -24,6 +24,7 @@ class SingerEvent {
   String eventDate;
   String submissionDeadline;
   EventStatus status;
+  String? posterPath;
 
   SingerEvent({
     required this.id,
@@ -31,6 +32,7 @@ class SingerEvent {
     required this.eventDate,
     required this.submissionDeadline,
     this.status = EventStatus.open,
+    this.posterPath,
   });
 }
 
@@ -61,6 +63,9 @@ class SingerPair {
   final String singer2Id;
   final String songTitle;
   String? karaokeLink;
+  bool confirmed;
+  bool paid;
+  double confirmationFee;
 
   SingerPair({
     required this.id,
@@ -69,6 +74,9 @@ class SingerPair {
     required this.singer2Id,
     required this.songTitle,
     this.karaokeLink,
+    this.confirmed = false,
+    this.paid = false,
+    this.confirmationFee = 99.0,
   });
 }
 

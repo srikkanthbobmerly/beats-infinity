@@ -4,7 +4,7 @@ import '../state/app_state.dart';
 import '../theme.dart';
 import '../widgets/quick_action_tile.dart';
 import '../widgets/initials_avatar.dart';
-import '../data/song_submission_screen.dart';
+import 'song_submission_screen.dart';
 import 'all_songs_screen.dart';
 import 'my_pairing_screen.dart';
 import 'published_lineup_screen.dart';
@@ -33,14 +33,14 @@ class HomeTabBody extends StatelessWidget {
               gradient: gradientPrimary,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: AppColors.primary.withOpacity(0.35), blurRadius: 18, offset: const Offset(0, 8)),
+                BoxShadow(color: AppColors.primary.withValues(alpha: 0.35), blurRadius: 18, offset: const Offset(0, 8)),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: const [
+                const Row(
+                  children: [
                     Icon(Icons.celebration_rounded, color: Colors.white, size: 20),
                     SizedBox(width: 6),
                     Text('THIS MONTH\'S THEME',

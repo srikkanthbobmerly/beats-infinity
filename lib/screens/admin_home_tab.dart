@@ -25,15 +25,37 @@ class AdminHomeTabBody extends StatelessWidget {
         : appState.pairs.where((p) => p.eventId == openEvent.id).length;
 
     final items = <_AdminItem>[
-      _AdminItem(Icons.add_circle_outline_rounded, AppColors.primary, 'Create / Edit Event', 'Set the theme & dates', (_) => const CreateEventScreen()),
+      _AdminItem(
+        icon: Icons.add_circle_outline_rounded,
+        color: AppColors.primary,
+        title: 'Create / Edit Event',
+        subtitle: 'Set the theme & dates',
+        builder: (_) => const CreateEventScreen(),
+      ),
       if (openEvent != null)
-        _AdminItem(Icons.auto_awesome_rounded, AppColors.pink, 'Auto-Pairing', 'Run the smart matcher', (_) => AutoPairingScreen(eventId: openEvent.id)),
+        _AdminItem(
+          icon: Icons.favorite_rounded,
+          color: AppColors.pink,
+          title: 'Pairing',
+          subtitle: 'Auto-match or pair manually',
+          onTap: (ctx) => _showPairingSheet(ctx, openEvent.id),
+        ),
       if (openEvent != null)
-        _AdminItem(Icons.pan_tool_alt_rounded, AppColors.accent, 'Manual Pairing', 'Assign pairs by hand', (_) => ManualPairingScreen(eventId: openEvent.id)),
+        _AdminItem(
+          icon: Icons.headphones_rounded,
+          color: AppColors.teal,
+          title: 'Assign Karaoke Tracks',
+          subtitle: 'Attach a link per pair',
+          builder: (_) => KaraokeAssignScreen(eventId: openEvent.id),
+        ),
       if (openEvent != null)
-        _AdminItem(Icons.headphones_rounded, AppColors.teal, 'Assign Karaoke Tracks', 'Attach a link per pair', (_) => KaraokeAssignScreen(eventId: openEvent.id)),
-      if (openEvent != null)
-        _AdminItem(Icons.rocket_launch_rounded, AppColors.success, 'Publish Lineup', 'Notify everyone', (_) => PublishLineupScreen(eventId: openEvent.id)),
+        _AdminItem(
+          icon: Icons.rocket_launch_rounded,
+          color: AppColors.success,
+          title: 'Publish Lineup',
+          subtitle: 'Notify everyone',
+          builder: (_) => PublishLineupScreen(eventId: openEvent.id),
+        ),
     ];
 
     return ListView(
@@ -88,39 +110,45 @@ class AdminHomeTabBody extends StatelessWidget {
         const Text('Manage', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
         const SizedBox(height: 12),
         ...items.map((item) => Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              child: Material(
-                color: AppColors.card,
-                borderRadius: BorderRadius.circular(14),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: item.builder)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(color: item.color.withOpacity(0.18), borderRadius: BorderRadius.circular(12)),
-                          child: Icon(item.icon, color: item.color, size: 22),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(item.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
-                              Text(item.subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
-                      ],
+          margin: const EdgeInsets.only(bottom: 10),
+          child: Material(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () {
+                if (item.onTap != null) {
+                  item.onTap!(context);
+                } else if (item.builder != null) {
+                  Navigator.of(context).push(MaterialPageRoute(builder: item.builder!));
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: item.color.withOpacity(0.18), borderRadius: BorderRadius.circular(12)),
+                      child: Icon(item.icon, color: item.color, size: 22),
                     ),
-                  ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(item.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                          Text(item.subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+                  ],
                 ),
               ),
-            )),
+            ),
+          ),
+        )),
       ],
     );
   }
@@ -142,11 +170,130 @@ class AdminHomeTabBody extends StatelessWidget {
   }
 }
 
+/// Bottom sheet shown when the admin taps "Pairing" — lets them choose
+/// between the smart auto-matcher and doing it by hand.
+void _showPairingSheet(BuildContext context, String eventId) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (sheetContext) => Container(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
+      decoration: const BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(color: AppColors.cardAlt, borderRadius: BorderRadius.circular(4)),
+            ),
+          ),
+          const Text('Pairing', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          const Text(
+            "Choose how you'd like to pair singers for this event.",
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          ),
+          const SizedBox(height: 22),
+          _PairingOption(
+            icon: Icons.auto_awesome_rounded,
+            color: AppColors.pink,
+            title: 'Auto-Pairing',
+            subtitle: 'Run the smart matcher',
+            onTap: () {
+              Navigator.of(sheetContext).pop();
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => AutoPairingScreen(eventId: eventId)));
+            },
+          ),
+          const SizedBox(height: 10),
+          _PairingOption(
+            icon: Icons.pan_tool_alt_rounded,
+            color: AppColors.accent,
+            title: 'Manual Pairing',
+            subtitle: 'Assign pairs by hand',
+            onTap: () {
+              Navigator.of(sheetContext).pop();
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ManualPairingScreen(eventId: eventId)));
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _PairingOption extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _PairingOption({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.cardAlt,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: color.withOpacity(0.18), borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                    Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _AdminItem {
   final IconData icon;
   final Color color;
   final String title;
   final String subtitle;
-  final Widget Function(BuildContext) builder;
-  _AdminItem(this.icon, this.color, this.title, this.subtitle, this.builder);
+  final Widget Function(BuildContext)? builder;
+  final void Function(BuildContext)? onTap;
+
+  _AdminItem({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    this.builder,
+    this.onTap,
+  }) : assert(builder != null || onTap != null, 'Provide either builder or onTap');
 }
